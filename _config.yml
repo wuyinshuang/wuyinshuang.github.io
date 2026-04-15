@@ -84,7 +84,12 @@ pwa:
     deny_paths:
       # - "/example"  # URLs match `<SITE_URL>/example/*` will not be cached by the PWA
 
+# _config.yml
 
+html_proofer:
+  # 其他配置...
+  allow_missing_href: true  # <-- 加上这一行！允许a标签没有href属性
+  allow_hash_href: true    # 如果你的链接是 href="#" 也可以加上这一行
 
 
 
