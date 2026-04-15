@@ -17,7 +17,5 @@ author: wuys
 
 ### 1、创建新的Github Repository
 
-1.1 进入Github官网（[https://github.com/]()），点击sign in登录自己的账号（如果没有账号先注册一个）。
 
-1.2 点击create a new repository，创建新的仓库，假设仓库名为page。
 
