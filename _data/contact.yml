@@ -3,8 +3,8 @@
 - type: github
   icon: "fab fa-github"
 
-- type: twitter
-  icon: "fa-brands fa-weixin"
+- type: wechat
+  icon: "fab fa-weixin"
   link: "javascript:;"  # 关键：留空则不生成链接
   title: 我的微信号：wynter11  # 悬浮文字
   text: 微信
