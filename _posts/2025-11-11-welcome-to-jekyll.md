@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "欢迎来到我的技术博客"
-date: 2024-01-15
+date: 2025-11-11
 categories: [博客搭建]
 tags: [Jekyll, GitHub Pages, 博客]
 author: wuys
@@ -15,5 +15,3 @@ author: wuys
 
 - 记录技术学习心得
 - 分享开发经验
-
-
