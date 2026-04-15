@@ -1,10 +1,12 @@
 ---
+```yaml
 layout: post
 title: "如何使用Github Pages搭建个人主页"
 date: 2026-04-13
 categories: [测试]
 tags: [GitHub Pages, 个人主页]
-author: 吴银双
+author: wuys
+```
 ---
 
 <!DOCTYPE html>
@@ -129,5 +131,4 @@ git push
 **作者**：吴银双  
 **日期**：2026年4月13日  
 **平台**：GitHub Pages / 技术博客
-
 
