@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "测试"
+title: "如何使用Github Pages搭建个人主页"
 date: 2026-04-13
 categories: [博客搭建]
 tags: [Jekyll, GitHub Pages, 博客]
@@ -125,4 +125,3 @@ git push
 **作者**：吴银双  
 **日期**：2026年4月13日  
 **平台**：GitHub Pages / 技术博客
-
