@@ -35,9 +35,21 @@ webmaster_verifications:
   baidu: # fill in your Baidu verification code
 
 # Web Analytics Settings
+# analytics:
+#   google:
+#     id: # fill in your Google Analytics ID
+
+includes:
+  - custom-head.html
+
+# 添加不蒜子配置
+# Analytics
 analytics:
-  google:
-    id: # fill in your Google Analytics ID
+  busuanzi:
+    enable: true
+    site_pv: true  # 显示网站总访问量
+    site_uv: true  # 显示网站总访客数
+    page_pv: true  # 显示页面访问量
  
 # Page views settings
 pageviews:
