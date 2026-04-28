@@ -1,0 +1,7 @@
+https://www.wuyinshuang.com/posts/welcome-to-jekyll/
+https://www.wuyinshuang.com/posts/github-pages-start/
+https://www.wuyinshuang.com/posts/local-start-Jekyll/
+https://www.wuyinshuang.com/posts/github-visit/
+https://www.wuyinshuang.com/posts/qwen3-tts-deploy/
+https://www.wuyinshuang.com/posts/ai_learn_python/
+https://www.wuyinshuang.com/posts/ai_learn_xd1/
