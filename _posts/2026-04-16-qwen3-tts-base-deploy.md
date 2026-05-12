@@ -1,19 +1,21 @@
 ---
 layout: post
-title: "如何部署qwen3-tts模型"
-date: 2026-04-16
+title: "qwen3-tts-Base模型部署测试"
+date: 2026-05-12
 categories: [大模型]
-tags: [qwen3-tts, ai]
+tags: [qwen3-tts-Base, ai, 模型部署]
 author: wuys
 ---
 
 ### 一、引言
 
-最近在语言asr/tts模型，qwen3-asr已经部署好了，需要再部署一下qwen3-tts模型，部署环境是Linux系统+docker镜像+vllm-omni镜像（v0.14.0版本），因为中间有个坑，花了整整三天时间才部署好，心力交瘁了哈哈哈
+之前已经部署了qwen3-asr/tts模型，但是有些场景需要语音合成使用指定的音色，比如企业形象音色，所以这次部署一下qwen3-tts-Base模型测试音色克隆。部署之前可以去在线网站测试一下效果：[Qwen3-TTS](https://modelscope.cn/studios/Qwen/Qwen3-TTS)
 
 ### 二、操作步骤
 
-#### 1.运行前检查环境是否正常：
+#### 1.先去魔塔社区下载Qwen3-TTS-12Hz-1.7B-Base模型，不会的参考另一篇笔记：[modelscope下载模型到本地服务器 ](https://www.wuyinshuang.com/posts/modelscope_download_model/)。
+
+#### 2.运行前检查环境是否正常：
 
 ```bash
 #1.检查系统信息
@@ -37,32 +39,32 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:SLD_LIBRARY PATH
 python3 -version
 ```
 
-#### 2.编写运行脚本并执行：
+#### 3.编写运行脚本并执行：
 
 ```shell
 #1.进入用户目录下
 cd /home/deployuser
 #2.直接上传脚本文件(也可以编写start_tts_service.sh脚本，vim starttts service.sh#编写完退出:wq，较麻烦不推荐)
-start_tts_service.sh
+start_tts_base.sh
 #3.赋予执行权限
-chmod +x start_tts_service.sh
+chmod +x start_tts_base.sh
 #4.一键启动
-sudo sh start_tts_service.sh
+sudo sh start_tts_base.sh
 ```
 
-start_tts_service.sh完整内容：
+start_tts_base.sh完整内容：
 
 ```bash
 #!/bin/bash
-#直接使用官方命令启动本地Qwen3-Tts服务，不考虑缓存日录，不指定持定的qwen3_tts.yaml配置文件
-#模型:Qwen/Qwen3-ITS-12Hz-1.7B-CustomVoice(实际为本地模型)
+#使用 vllm-omni Docker镜像
+#模型:Qwen/Qwen3-ITS-12Hz-1.7B-Base(实际为本地模型)
 set -e
 #配置参数
 #模型路径(宿主机)
-MODEL_PATH="填写你自己的模型路径，比如/data/model/Qwen3-ITS-12Hz-1.7B-CustomVoice"
+MODEL_PATH="填写你自己的模型路径，比如/data/model/Qwen3-ITS-12Hz-1.7B-Base"
 #容器内模型文件路径
-#注意!!!容器内路径定义一定要包含官方的Qwen3/Qwen3-ITS-12Hz-1.7B-CustomVoice，否则会报错invalid task_type，我就是在这里踩坑耽误了两天时间！！！可以在这个路径前面加目录，不能在后面加！
-CONTAINER_MODEL_PATH="自定义容器路径，比如/app/model/Qwen3/Qwen3-ITS-12Hz-1.7B-CustomVoice"
+#注意!!!容器内路径定义一定要包含官方的Qwen3/Qwen3-ITS-12Hz-1.7B-Base，否则会报错invalid task_type，我就是在这里踩坑耽误了两天时间！！！可以在这个路径前面加目录，不能在后面加！
+CONTAINER_MODEL_PATH="自定义容器路径，比如/app/model/Qwen3/Qwen3-ITS-12Hz-1.7B-Base"
 #容器名称
 CONTAINER_NAME="qwen3-tts-service"
 #服务端口(宿主机端口:容器内端口)
@@ -79,7 +81,7 @@ IMAGE_NAME="vllm/vllm-omni:v0.14.0"
 #vllm-omni镜像内自带配置文件，默认路径不要改qwen3_tts.yaml
 CONFIG_PATH="/workspace/vllm-omni/vllm_omni/model_executor/stage_configs/qwen3_tts.yaml"
 #模型对外名称
-SERVED_MODEL_NAME="qwen3-tts-customvoice"
+SERVED_MODEL_NAME="qwen3-tts"
 #--------------------------------------------------------------------------------------------
 
 #检查环境
@@ -184,26 +186,17 @@ curl -s "http://locolhost:8091/v1/models"
 curl -X POST http://localhost:8091/v1/audio/speech \
     -H "Content-Type: application/json" \
     -d '{
-        "input": "Hello, how are you?",
-        "voice": "vivian",
-        "language": "English",
-        "stream": true,
-        "response_format": "pcm"
-    }' --no-buffer | play -t raw -r 24000 -e signed -b 16 -c 1 -
+        "task_type":"Base",
+        "input": "您好，请问有什么可以帮到您？",
+        "response_format":"wav",
+        "ref_audio":"data:audio/wav;base64,你的被克隆音频的Base64编码"
+        "ref_text": "你的被克隆音频的正确文本"
+    }' --output output.wav
 ```
 
 ### 三、总结
 
-官方文档中只给了从hug仓库拉取模型的部署命令，没有给启动本地模型的命令，所以一开始并不知道本地部署路径也要包含Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice这种格式，他才能识别出task_type，后来是自己猜想并实验得出来的结果，可以说是个很大的坑了。
-
-```bash
-vllm serve Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice \
-    --stage-configs-path /path/to/stage_configs_file \
-    --omni \
-    --port 8091
-```
-
-后面又试了在Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice路径前加目录、中间加目录、后面加目录，最终发现只有在后面加目录不行，这个也是v0.14.0版本的官方bug，已经有开发者提出并在新版本中修复。
+其实qwen3-tts-base跟之前qwen3-tts-customvoice部署的脚本是几乎一样的，但是调用方式不同。需要注意qwen3-tts-base模型的task_type传参为Base，qwen3-tts-customvoice模型的task_type传参为CustomVoice。另外，qwen3-tts-customvoice是直接指定voice为内置的9种音色，而qwen3-tts-base需要传被克隆音频的base64编码和原文本。
 
 
 
@@ -211,9 +204,9 @@ vllm serve Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice \
 
 qwen3-tts官方文档：[Qwen3-TTS - vLLM-Omni](https://docs.vllm.ai/projects/vllm-omni/en/stable/user_guide/examples/online_serving/qwen3_tts/)
 
-魔搭社区qwen3-tts模型：[Qwen3-TTS-12Hz-1.7B-CustomVoice](https://www.modelscope.cn/models/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/summary)
+魔搭社区qwen3-tts模型：[Qwen3-TTS-12Hz-1.7B-Base](https://www.modelscope.cn/models/Qwen/Qwen3-TTS-12Hz-1.7B-Base/summary)
 
-vllm-omni的v0.14.0版本部署路径Qwen3/Qwen3-ITS-12Hz-1.7B-CustomVoice后面不能加其他内容：https://github.com/vllm-project/vllm-omni/pull/1317
+vllm-omni的v0.14.0版本部署路径Qwen3/Qwen3-ITS-12Hz-1.7B-Base后面不能加其他内容：https://github.com/vllm-project/vllm-omni/pull/1317
 
 
 
@@ -221,6 +214,6 @@ vllm-omni的v0.14.0版本部署路径Qwen3/Qwen3-ITS-12Hz-1.7B-CustomVoice后面
 
 **作者**：吴银双
 
-**日期**：2026年4月16日
+**日期**：2026年5月12日
 
 **平台**：GitHub Pages / 技术博客
