@@ -59,7 +59,7 @@ bundle init
    gem "jekyll-paginate", "~> 1.1.0"
 ```
 
-#### 5.**安装项目依赖**：
+#### 5.安装项目依赖：
 
 在项目根目录执行：bundle install, 这会下载并安装 `Gemfile`中指定的所有插件（包括 Jekyll、Minima、jekyll-paginate）。 
 
