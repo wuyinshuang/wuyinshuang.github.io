@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "claude code常用命令梳理"
-date: 2026-05-14
+date: 2026-05-15
 categories: [大模型]
 tags: [claude code, trae]
 author: wuys
@@ -19,7 +19,7 @@ author: wuys
 | /model    | 切换高中低档模型                                                          |
 | /btw      | By the way缩写，可以暂时切出正在执行的项目，隔离上下文，方便使用者与CC进行临时对话。会话完毕后，可按esc消除临时会话 |
 | /simplify | 输入后会派生出3个agent，从代码质量、运行效率和复用性三个角度做一次代码审核，然后自动优化修改                 |
-| /rewind   | 进入回滚界面                                                            |
+| /rewind   | 进入回滚界面，但是我们一般使用git进行版本管理              |
 | /compact  | 主动压缩精简上下文                                                         |
 | /clear    | 彻底清空上下文，相当...重开一个会话                                               |
 | /context  | 详细展示agent当前的上下文信息，诸如：上下文占比，上下文类别等等                                |
