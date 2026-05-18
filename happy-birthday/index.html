@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎂 白晨晨 生日快乐</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0a0015;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+  }
+
+  /* ===== 背景渐变 ===== */
+  #bg-gradient {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, #1a0030, #0a0015);
+    z-index: 0;
+  }
+  #bg-gradient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(255,100,150,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(255,200,50,0.06) 0%, transparent 60%);
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes bgPulse {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  /* ===== 幻灯片 ===== */
+  #slideshow {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.8s ease-in-out;
+    overflow: hidden;
+  }
+  .slide.active {
+    opacity: 1;
+  }
+  .slide img {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: kenBurns 10s ease-in-out forwards;
+  }
+  @keyframes kenBurns {
+    0%   { transform: scale(1.0) translate(0, 0); }
+    50%  { transform: scale(1.08) translate(-1%, -1%); }
+    100% { transform: scale(1.0) translate(0, 0); }
+  }
+  .slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.4) 100%);
+  }
+
+  /* ===== 内容层 ===== */
+  #content {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ===== 标题 ===== */
+  .title-line {
+    font-size: clamp(2rem, 8vw, 5rem);
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.3;
+    text-shadow: 0 0 40px rgba(255,100,150,0.3);
+  }
+  .title-line .name {
+    display: inline-block;
+    background: linear-gradient(135deg, #f9d976, #f39f86, #f9d976);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px rgba(249,159,134,0.3));
+  }
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .title-line .sub {
+    display: block;
+    font-size: 0.45em;
+    background: linear-gradient(135deg, #ffd1dc, #ff9a9e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 0.2em;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+  }
+
+  /* ===== 打字副标题 ===== */
+  #subtitle {
+    margin-top: 30px;
+    font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    letter-spacing: 0.1em;
+    min-height: 1.6em;
+    text-shadow: 0 0 20px rgba(255,200,150,0.2);
+  }
+  #subtitle .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.2em;
+    background: #f9d976;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 0.8s step-end infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ===== BGM 开关 ===== */
+  #music-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 100;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    color: rgba(255,255,255,0.8);
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #music-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+  }
+  #music-btn.playing {
+    animation: pulseBtn 2s ease-in-out infinite;
+  }
+  @keyframes pulseBtn {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(249,159,134,0.3); }
+    50% { box-shadow: 0 0 0 12px rgba(249,159,134,0); }
+  }
+  #music-btn .icon {
+    display: inline-block;
+    transition: transform 0.4s ease;
+  }
+  #music-btn.paused .icon {
+    transform: scale(0.8);
+  }
+
+  /* ===== 浮动心形 ===== */
+  .float-heart {
+    position: fixed;
+    z-index: 5;
+    font-size: 24px;
+    opacity: 0;
+    pointer-events: none;
+    animation: floatUp var(--dur, 6s) ease-in var(--delay, 0s) forwards;
+  }
+  @keyframes floatUp {
+    0% {
+      opacity: 0;
+      transform: translateY(100vh) rotate(0deg) scale(0.5);
+    }
+    10% {
+      opacity: var(--max-opacity, 0.7);
+    }
+    90% {
+      opacity: var(--max-opacity, 0.7);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-10vh) rotate(var(--rot, 360deg)) scale(1.2);
+    }
+  }
+
+  /* ===== 五彩纸屑 ===== */
+  .confetti-piece {
+    position: fixed;
+    z-index: 6;
+    width: var(--size, 10px);
+    height: var(--size, 10px);
+    top: -20px;
+    opacity: 0;
+    pointer-events: none;
+    animation: confettiFall var(--fall-dur, 4s) ease-in var(--delay, 0s) forwards;
+  }
+  @keyframes confettiFall {
+    0% {
+      opacity: 0;
+      transform: translateY(0) rotate(0deg) scale(1);
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(110vh) rotate(var(--spin, 720deg)) scale(0.5);
+    }
+  }
+
+  /* ===== 星星闪烁 ===== */
+  .star {
+    position: fixed;
+    z-index: 2;
+    width: var(--star-size, 3px);
+    height: var(--star-size, 3px);
+    border-radius: 50%;
+    background: #fff;
+    pointer-events: none;
+    animation: twinkle var(--twinkle-dur, 3s) ease-in-out infinite alternate;
+  }
+  @keyframes twinkle {
+    0%   { opacity: var(--min-op, 0.2); transform: scale(1); }
+    100% { opacity: var(--max-op, 1);   transform: scale(1.3); }
+  }
+
+  /* ===== 底部文字 ===== */
+  #footer {
+    position: fixed;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    text-align: center;
+    color: rgba(255,255,255,0.2);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+  }
+
+  /* ===== 加载过渡 ===== */
+  #loader {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: #0a0015;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 1.2s ease;
+  }
+  #loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loader-ring {
+    width: 60px;
+    height: 60px;
+    border: 3px solid transparent;
+    border-top-color: #f9d976;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  .loader-ring::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 3px solid transparent;
+    border-bottom-color: #f39f86;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite reverse;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 480px) {
+    #music-btn { bottom: 20px; right: 20px; width: 44px; height: 44px; font-size: 18px; }
+    .float-heart { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 加载 -->
+<div id="loader"><div class="loader-ring"></div></div>
+
+<!-- 背景 -->
+<div id="bg-gradient"></div>
+
+<!-- 幻灯片 -->
+<div id="slideshow"></div>
+
+<!-- 内容 -->
+<div id="content">
+  <div class="title-line">
+    <span class="name">白晨晨</span>
+    <span class="sub">🎂 生日快乐 🎂</span>
+  </div>
+  <div id="subtitle"></div>
+</div>
+
+<div id="footer">✦ 愿你每一天都闪闪发光 ✦</div>
+
+<!-- 音乐按钮 -->
+<button id="music-btn" class="playing" title="点击开关音乐">
+  <span class="icon">🎵</span>
+</button>
+
+<script>
+// =============================================
+// 1. 幻灯片
+// =============================================
+(function initSlideshow() {
+  const container = document.getElementById('slideshow');
+  const count = 7;
+  const slides = [];
+  for (let i = 1; i <= count; i++) {
+    const div = document.createElement('div');
+    div.className = 'slide' + (i === 1 ? ' active' : '');
+    const img = document.createElement('img');
+    img.src = `照片/${i}.jpg`;
+    img.alt = `Photo ${i}`;
+    img.loading = i <= 2 ? 'eager' : 'lazy';
+    div.appendChild(img);
+    container.appendChild(div);
+    slides.push(div);
+  }
+  let current = 0;
+  let interval = setInterval(nextSlide, 5000);
+  function nextSlide() {
+    slides[current].classList.remove('active');
+    current = (current + 1) % count;
+    slides[current].classList.add('active');
+  }
+  // 点击切换
+  container.addEventListener('click', () => {
+    clearInterval(interval);
+    nextSlide();
+    interval = setInterval(nextSlide, 5000);
+  });
+})();
+
+// =============================================
+// 2. 打字副标题
+// =============================================
+(function initTyping() {
+  const el = document.getElementById('subtitle');
+  const lines = [
+    '愿你的笑容比星光更灿烂 ✨',
+    '愿所有的美好都如约而至 🌸',
+    '新的一岁，要更快乐更自由 🦋',
+    '你值得世间所有的温柔 💕',
+    'Happy Birthday to You 🎉'
+  ];
+  let lineIdx = 0, charIdx = 0, isDeleting = false;
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+
+  function tick() {
+    const full = lines[lineIdx];
+    if (!isDeleting) {
+      charIdx++;
+      el.textContent = full.slice(0, charIdx);
+      el.appendChild(cursor);
+      if (charIdx >= full.length) {
+        setTimeout(() => { isDeleting = true; tick(); }, 2500);
+        return;
+      }
+      setTimeout(tick, 60 + Math.random() * 40);
+    } else {
+      charIdx--;
+      el.textContent = full.slice(0, charIdx);
+      el.appendChild(cursor);
+      if (charIdx <= 0) {
+        isDeleting = false;
+        lineIdx = (lineIdx + 1) % lines.length;
+        setTimeout(tick, 400);
+        return;
+      }
+      setTimeout(tick, 30);
+    }
+  }
+  setTimeout(tick, 800);
+})();
+
+// =============================================
+// 3. 星星背景
+// =============================================
+(function initStars() {
+  const count = 120;
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = 1 + Math.random() * 3;
+    star.style.setProperty('--star-size', size + 'px');
+    star.style.left = (Math.random() * 100) + '%';
+    star.style.top = (Math.random() * 100) + '%';
+    star.style.setProperty('--min-op', (0.1 + Math.random() * 0.3).toFixed(2));
+    star.style.setProperty('--max-op', (0.4 + Math.random() * 0.6).toFixed(2));
+    star.style.setProperty('--twinkle-dur', (2 + Math.random() * 4).toFixed(1) + 's');
+    star.style.animationDelay = (Math.random() * 5).toFixed(1) + 's';
+    document.body.appendChild(star);
+  }
+})();
+
+// =============================================
+// 4. 浮动心形
+// =============================================
+(function initFloatingHearts() {
+  const emojis = ['❤️', '💕', '💗', '✨', '🌸', '🎈', '💖', '🌟', '🦋', '💝'];
+  function create() {
+    const el = document.createElement('div');
+    el.className = 'float-heart';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (5 + Math.random() * 90) + '%';
+    el.style.fontSize = (16 + Math.random() * 24) + 'px';
+    el.style.setProperty('--dur', (6 + Math.random() * 6).toFixed(1) + 's');
+    el.style.setProperty('--delay', '0s');
+    el.style.setProperty('--max-opacity', (0.4 + Math.random() * 0.4).toFixed(2));
+    el.style.setProperty('--rot', (180 + Math.random() * 360) + 'deg');
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 12000);
+  }
+  setInterval(create, 500);
+  for (let i = 0; i < 5; i++) setTimeout(create, i * 300);
+})();
+
+// =============================================
+// 5. 五彩纸屑
+// =============================================
+(function initConfetti() {
+  const colors = ['#f9d976', '#f39f86', '#ff6b9d', '#c084fc', '#60a5fa', '#34d399', '#fb923c', '#ffd1dc'];
+  function create() {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const size = 6 + Math.random() * 10;
+    el.style.setProperty('--size', size + 'px');
+    el.style.left = (Math.random() * 100) + '%';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.setProperty('--fall-dur', (3 + Math.random() * 3).toFixed(1) + 's');
+    el.style.setProperty('--delay', (Math.random() * 2).toFixed(1) + 's');
+    el.style.setProperty('--spin', (360 + Math.random() * 720) + 'deg');
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 8000);
+  }
+  setInterval(create, 200);
+  for (let i = 0; i < 10; i++) setTimeout(create, i * 80);
+})();
+
+// =============================================
+// 6. 音乐 - Web Audio API 演奏生日快乐
+// =============================================
+(function initMusic() {
+  const btn = document.getElementById('music-btn');
+  const icon = btn.querySelector('.icon');
+  let isPlaying = true;
+  let audioCtx = null;
+  let gainNode = null;
+  let currentTimeout = null;
+  let isMusicActive = false;
+
+  // 生日快乐旋律 (频率, 开始时间, 时长)
+  const melody = [
+    // Happy birth-day to you
+    [261.63, 0, 0.3], [261.63, 0.35, 0.15],
+    [293.66, 0.55, 0.3], [261.63, 0.9, 0.3],
+    [349.23, 1.25, 0.3], [329.63, 1.6, 0.5],
+    // Happy birth-day to you
+    [261.63, 2.3, 0.3], [261.63, 2.65, 0.15],
+    [293.66, 2.85, 0.3], [261.63, 3.2, 0.3],
+    [392.00, 3.55, 0.3], [349.23, 3.9, 0.5],
+    // Happy birth-day dear 晨晨
+    [261.63, 4.6, 0.3], [261.63, 4.95, 0.15],
+    [523.25, 5.15, 0.3], [440.00, 5.5, 0.3],
+    [349.23, 5.85, 0.3], [329.63, 6.2, 0.3],
+    [293.66, 6.55, 0.5],
+    // Happy birth-day to you
+    [440.00, 7.3, 0.3], [440.00, 7.65, 0.15],
+    [392.00, 7.85, 0.3], [349.23, 8.2, 0.3],
+    [392.00, 8.55, 0.3], [349.23, 8.9, 0.6],
+  ];
+
+  // 和弦伴奏（简化版）
+  const chords = [
+    // C major
+    [261.63, 329.63, 392.00], [261.63, 329.63, 392.00],
+    // F major
+    [349.23, 440.00, 523.25], [349.23, 440.00, 523.25],
+    // G major
+    [392.00, 493.88, 587.33], [392.00, 493.88, 587.33],
+    // C major
+    [261.63, 329.63, 392.00], [261.63, 329.63, 392.00],
+  ];
+
+  function playNote(freq, startTime, duration, vol = 0.12) {
+    const osc = audioCtx.createOscillator();
+    const noteGain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, startTime);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, startTime);
+    filter.frequency.linearRampToValueAtTime(1200, startTime + duration);
+
+    noteGain.gain.setValueAtTime(0, startTime);
+    noteGain.gain.linearRampToValueAtTime(vol, startTime + 0.03);
+    noteGain.gain.setValueAtTime(vol, startTime + duration * 0.7);
+    noteGain.gain.linearRampToValueAtTime(0, startTime + duration);
+
+    osc.connect(filter);
+    filter.connect(noteGain);
+    noteGain.connect(gainNode);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.05);
+  }
+
+  function playChord(freqs, startTime, duration) {
+    freqs.forEach(f => playNote(f, startTime, duration, 0.04));
+  }
+
+  function scheduleMusic() {
+    const now = audioCtx.currentTime;
+    const loopDuration = 10.0;
+    const startOffset = 0.3;
+
+    // 安排旋律
+    melody.forEach(([freq, t, dur]) => {
+      if (t + startOffset + dur > now + 0.1) {
+        playNote(freq, Math.max(now + 0.05, startOffset + t), dur);
+      }
+    });
+
+    // 安排和弦（每2拍一个）
+    const chordPoints = [0, 2.3, 4.6, 7.3];
+    chordPoints.forEach((cp, i) => {
+      const chordTime = startOffset + cp;
+      if (chordTime > now + 0.05) {
+        const chordFreqs = chords[i % chords.length];
+        playChord(chordFreqs, chordTime, 1.8);
+      }
+    });
+
+    // 循环
+    currentTimeout = setTimeout(scheduleMusic, (loopDuration) * 1000);
+  }
+
+  function startMusic() {
+    if (isMusicActive) return;
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.6;
+      gainNode.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    isMusicActive = true;
+    scheduleMusic();
+  }
+
+  function stopMusic() {
+    isMusicActive = false;
+    if (currentTimeout) {
+      clearTimeout(currentTimeout);
+      currentTimeout = null;
+    }
+  }
+
+  // 首次交互启动音乐（浏览器策略）
+  function firstStart() {
+    startMusic();
+    document.removeEventListener('click', firstStart);
+    document.removeEventListener('touchstart', firstStart);
+  }
+  document.addEventListener('click', firstStart);
+  document.addEventListener('touchstart', firstStart);
+
+  // 点击切换
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (isPlaying) {
+      stopMusic();
+      btn.classList.remove('playing');
+      btn.classList.add('paused');
+      icon.textContent = '🎵';
+    } else {
+      startMusic();
+      btn.classList.add('playing');
+      btn.classList.remove('paused');
+      icon.textContent = '♪';
+    }
+    isPlaying = !isPlaying;
+  });
+
+  // 页面可见性变化时自动暂停/恢复
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && isMusicActive) {
+      // 后台时降低音量或暂停
+      if (gainNode) gainNode.gain.value = 0.15;
+    } else if (!document.hidden && isMusicActive) {
+      if (gainNode) gainNode.gain.value = 0.6;
+    }
+  });
+})();
+
+// =============================================
+// 7. 页面加载完成
+// =============================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 500);
+});
+
+// =============================================
+// 8. 预加载下几张图片
+// =============================================
+(function preloadImages() {
+  const imgs = [];
+  for (let i = 3; i <= 7; i++) {
+    const img = new Image();
+    img.src = `照片/${i}.jpg`;
+    imgs.push(img);
+  }
+})();
+</script>
+</body>
+</html>
