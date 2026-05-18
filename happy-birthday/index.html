@@ -484,6 +484,67 @@
     }
   }
 
+  /* ===== 启动封面 ===== */
+  #start-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 50%, #1a0030, #0a0015);
+    cursor: pointer;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #start-screen.hidden {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+  .start-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+    animation: startBounce 2s ease-in-out infinite;
+  }
+  @keyframes startBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.05); }
+  }
+  .start-title {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    color: #fbbf24;
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 40px rgba(251,191,36,0.3);
+  }
+  .start-sub {
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    font-size: clamp(1rem, 3.5vw, 1.6rem);
+    color: rgba(255,255,255,0.7);
+    margin-top: 8px;
+    letter-spacing: 0.2em;
+  }
+  .start-btn {
+    margin-top: 40px;
+    padding: 14px 48px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
+    color: rgba(255,255,255,0.85);
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+  }
+  .start-btn:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.4);
+    box-shadow: 0 0 30px rgba(255,255,255,0.05);
+  }
+
   /* ===== 底部文字 ===== */
   #footer {
     position: fixed;
@@ -545,6 +606,14 @@
 
 <!-- 加载 -->
 <div id="loader"><div class="loader-ring"></div></div>
+
+<!-- 启动封面 -->
+<div id="start-screen">
+  <div class="start-icon">&#127874;</div>
+  <div class="start-title">白晨晨</div>
+  <div class="start-sub">&#127873; 生日快乐 &#127873;</div>
+  <div class="start-btn">&#9835; 点击开启音乐 &#9835;</div>
+</div>
 
 <!-- 背景 -->
 <div id="bg-gradient"></div>
@@ -997,27 +1066,26 @@
     if (loopTimeout) { clearTimeout(loopTimeout); loopTimeout = null; }
   }
 
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  gainNode = audioCtx.createGain();
-  gainNode.gain.value = 0.5;
-  gainNode.connect(audioCtx.destination);
+  // 等待启动封面点击
+  const startScreen = document.getElementById('start-screen');
 
-  function tryAutoStart() {
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume().then(() => { if (!isPausedByUser) startScheduler(); }).catch(() => {});
-    } else {
-      if (!isPausedByUser) startScheduler();
+  function bootFromInteraction() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.5;
+      gainNode.connect(audioCtx.destination);
     }
-  }
-  tryAutoStart();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!isPausedByUser && !isActive) startScheduler();
 
-  function firstInteraction() {
-    tryAutoStart();
-    document.removeEventListener('click', firstInteraction);
-    document.removeEventListener('touchstart', firstInteraction);
+    // 隐藏启动封面
+    startScreen.classList.add('hidden');
+    setTimeout(() => { startScreen.style.display = 'none'; }, 900);
   }
-  document.addEventListener('click', firstInteraction);
-  document.addEventListener('touchstart', firstInteraction);
+
+  startScreen.addEventListener('click', bootFromInteraction);
+  startScreen.addEventListener('touchstart', bootFromInteraction);
 
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
