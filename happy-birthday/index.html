@@ -73,7 +73,7 @@
     background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.4) 100%);
   }
 
-  /* ===== 内容层 ===== */
+  /* ===== 内容层 - 顶部布局 ===== */
   #content {
     position: fixed;
     inset: 0;
@@ -81,17 +81,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 20px;
+    pointer-events: none;
+  }
+  #content > * { pointer-events: auto; }
+
+  /* 顶部渐变遮罩，让文字在图片上更清晰 */
+  #top-mask {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 200px;
+    z-index: 9;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+    pointer-events: none;
   }
 
   /* ===== 标题 ===== */
   .title-line {
-    font-size: clamp(2rem, 8vw, 5rem);
-    font-weight: 900;
+    margin-top: max(20px, 3vh);
+    font-size: clamp(1.2rem, 4.5vw, 2.8rem);
+    font-weight: 700;
     text-align: center;
-    line-height: 1.3;
-    text-shadow: 0 0 40px rgba(255,100,150,0.3);
+    line-height: 1.2;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
   }
   .title-line .name {
     display: inline-block;
@@ -101,7 +114,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: shimmer 3s ease-in-out infinite;
-    filter: drop-shadow(0 0 30px rgba(249,159,134,0.3));
+    filter: drop-shadow(0 0 20px rgba(249,159,134,0.3));
   }
   @keyframes shimmer {
     0%, 100% { background-position: 0% 50%; }
@@ -109,30 +122,39 @@
   }
   .title-line .sub {
     display: block;
-    font-size: 0.45em;
+    font-size: 0.5em;
     background: linear-gradient(135deg, #ffd1dc, #ff9a9e);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-top: 0.2em;
-    font-weight: 600;
+    margin-top: 0.1em;
+    font-weight: 500;
     letter-spacing: 0.15em;
   }
 
-  /* ===== 打字副标题 ===== */
-  #subtitle {
-    margin-top: 30px;
-    font-size: clamp(0.9rem, 2.5vw, 1.4rem);
-    color: rgba(255,255,255,0.7);
+  /* ===== 打字副标题 - 底部 ===== */
+  #subtitle-wrap {
+    position: fixed;
+    bottom: 80px;
+    left: 0; right: 0;
+    z-index: 10;
     text-align: center;
+    pointer-events: none;
+    background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%);
+    padding: 40px 20px 20px;
+  }
+  #subtitle {
+    font-size: clamp(0.8rem, 2.2vw, 1.2rem);
+    color: rgba(255,255,255,0.75);
     letter-spacing: 0.1em;
     min-height: 1.6em;
-    text-shadow: 0 0 20px rgba(255,200,150,0.2);
+    text-shadow: 0 1px 12px rgba(0,0,0,0.5);
+    display: inline-block;
   }
   #subtitle .cursor {
     display: inline-block;
     width: 2px;
-    height: 1.2em;
+    height: 1.1em;
     background: #f9d976;
     margin-left: 2px;
     vertical-align: text-bottom;
@@ -316,12 +338,19 @@
 <!-- 幻灯片 -->
 <div id="slideshow"></div>
 
+<!-- 顶部渐变遮罩 -->
+<div id="top-mask"></div>
+
 <!-- 内容 -->
 <div id="content">
   <div class="title-line">
     <span class="name">白晨晨</span>
     <span class="sub">🎂 生日快乐 🎂</span>
   </div>
+</div>
+
+<!-- 副标题（底部） -->
+<div id="subtitle-wrap">
   <div id="subtitle"></div>
 </div>
 
@@ -475,161 +504,158 @@
 })();
 
 // =============================================
-// 6. 音乐 - Web Audio API 演奏生日快乐
+// 6. 音乐 - Web Audio API 演奏生日快乐（无缝循环）
 // =============================================
 (function initMusic() {
   const btn = document.getElementById('music-btn');
   const icon = btn.querySelector('.icon');
-  let isPlaying = true;
   let audioCtx = null;
   let gainNode = null;
-  let currentTimeout = null;
-  let isMusicActive = false;
+  let isActive = false;
+  let loopTimeout = null;
+  let isPausedByUser = false;
 
-  // 生日快乐旋律 (频率, 开始时间, 时长)
+  // 生日快乐旋律: [频率, 相对起始时间, 时长]
   const melody = [
-    // Happy birth-day to you
     [261.63, 0, 0.3], [261.63, 0.35, 0.15],
     [293.66, 0.55, 0.3], [261.63, 0.9, 0.3],
     [349.23, 1.25, 0.3], [329.63, 1.6, 0.5],
-    // Happy birth-day to you
     [261.63, 2.3, 0.3], [261.63, 2.65, 0.15],
     [293.66, 2.85, 0.3], [261.63, 3.2, 0.3],
     [392.00, 3.55, 0.3], [349.23, 3.9, 0.5],
-    // Happy birth-day dear 晨晨
     [261.63, 4.6, 0.3], [261.63, 4.95, 0.15],
     [523.25, 5.15, 0.3], [440.00, 5.5, 0.3],
     [349.23, 5.85, 0.3], [329.63, 6.2, 0.3],
     [293.66, 6.55, 0.5],
-    // Happy birth-day to you
     [440.00, 7.3, 0.3], [440.00, 7.65, 0.15],
     [392.00, 7.85, 0.3], [349.23, 8.2, 0.3],
     [392.00, 8.55, 0.3], [349.23, 8.9, 0.6],
   ];
+  const LOOP_LEN = 10.0; // 总时长
 
-  // 和弦伴奏（简化版）
-  const chords = [
-    // C major
-    [261.63, 329.63, 392.00], [261.63, 329.63, 392.00],
-    // F major
-    [349.23, 440.00, 523.25], [349.23, 440.00, 523.25],
-    // G major
-    [392.00, 493.88, 587.33], [392.00, 493.88, 587.33],
-    // C major
-    [261.63, 329.63, 392.00], [261.63, 329.63, 392.00],
-  ];
-
-  function playNote(freq, startTime, duration, vol = 0.12) {
-    const osc = audioCtx.createOscillator();
-    const noteGain = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
-
+  function playNote(ctx, dest, freq, time, dur, vol) {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    const f = ctx.createBiquadFilter();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, startTime);
-
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(800, startTime);
-    filter.frequency.linearRampToValueAtTime(1200, startTime + duration);
-
-    noteGain.gain.setValueAtTime(0, startTime);
-    noteGain.gain.linearRampToValueAtTime(vol, startTime + 0.03);
-    noteGain.gain.setValueAtTime(vol, startTime + duration * 0.7);
-    noteGain.gain.linearRampToValueAtTime(0, startTime + duration);
-
-    osc.connect(filter);
-    filter.connect(noteGain);
-    noteGain.connect(gainNode);
-
-    osc.start(startTime);
-    osc.stop(startTime + duration + 0.05);
+    osc.frequency.setValueAtTime(freq, time);
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(800, time);
+    f.frequency.linearRampToValueAtTime(1200, time + dur);
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(vol, time + 0.03);
+    g.gain.setValueAtTime(vol, time + dur * 0.7);
+    g.gain.linearRampToValueAtTime(0, time + dur);
+    osc.connect(f).connect(g).connect(dest);
+    osc.start(time);
+    osc.stop(time + dur + 0.05);
   }
 
-  function playChord(freqs, startTime, duration) {
-    freqs.forEach(f => playNote(f, startTime, duration, 0.04));
-  }
-
-  function scheduleMusic() {
-    const now = audioCtx.currentTime;
-    const loopDuration = 10.0;
-    const startOffset = 0.3;
-
-    // 安排旋律
+  // 用 AudioContext 精确时间调度一个完整循环
+  function scheduleOneLoop(ctx, dest, baseTime) {
     melody.forEach(([freq, t, dur]) => {
-      if (t + startOffset + dur > now + 0.1) {
-        playNote(freq, Math.max(now + 0.05, startOffset + t), dur);
-      }
+      const absTime = baseTime + t;
+      playNote(ctx, dest, freq, absTime, dur, 0.12);
     });
-
-    // 安排和弦（每2拍一个）
+    // 简易和弦伴奏
     const chordPoints = [0, 2.3, 4.6, 7.3];
+    const chordFreqs = [
+      [261.63, 329.63, 392.00],
+      [349.23, 440.00, 523.25],
+      [392.00, 493.88, 587.33],
+      [261.63, 329.63, 392.00],
+    ];
     chordPoints.forEach((cp, i) => {
-      const chordTime = startOffset + cp;
-      if (chordTime > now + 0.05) {
-        const chordFreqs = chords[i % chords.length];
-        playChord(chordFreqs, chordTime, 1.8);
-      }
+      const absTime = baseTime + cp;
+      chordFreqs[i].forEach(f => playNote(ctx, dest, f, absTime, 1.8, 0.04));
     });
-
-    // 循环
-    currentTimeout = setTimeout(scheduleMusic, (loopDuration) * 1000);
   }
 
-  function startMusic() {
-    if (isMusicActive) return;
+  function startScheduler() {
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       gainNode = audioCtx.createGain();
-      gainNode.gain.value = 0.6;
+      gainNode.gain.value = 0.5;
       gainNode.connect(audioCtx.destination);
     }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (isActive) return;
+    isActive = true;
+
+    // 以 AudioContext 当前时间为基准，持续调度未来的循环
+    let nextBase = audioCtx.currentTime + 0.1;
+    scheduleOneLoop(audioCtx, gainNode, nextBase);
+    nextBase += LOOP_LEN;
+
+    function keepScheduling() {
+      if (!isActive) return;
+      const now = audioCtx.currentTime;
+      const ahead = 0.3; // 提前 300ms 调度下一个循环
+      if (nextBase - now < ahead) {
+        scheduleOneLoop(audioCtx, gainNode, nextBase);
+        nextBase += LOOP_LEN;
+      }
+      loopTimeout = setTimeout(keepScheduling, 200);
+    }
+    keepScheduling();
+  }
+
+  function stopScheduler() {
+    isActive = false;
+    if (loopTimeout) { clearTimeout(loopTimeout); loopTimeout = null; }
+  }
+
+  // ===== 自动启动（尝试绕过浏览器策略） =====
+  // 直接创建并尝试启动
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.5;
+  gainNode.connect(audioCtx.destination);
+
+  function tryAutoStart() {
     if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    isMusicActive = true;
-    scheduleMusic();
-  }
-
-  function stopMusic() {
-    isMusicActive = false;
-    if (currentTimeout) {
-      clearTimeout(currentTimeout);
-      currentTimeout = null;
+      audioCtx.resume().then(() => {
+        if (!isPausedByUser) startScheduler();
+      }).catch(() => {});
+    } else {
+      if (!isPausedByUser) startScheduler();
     }
   }
 
-  // 首次交互启动音乐（浏览器策略）
-  function firstStart() {
-    startMusic();
-    document.removeEventListener('click', firstStart);
-    document.removeEventListener('touchstart', firstStart);
-  }
-  document.addEventListener('click', firstStart);
-  document.addEventListener('touchstart', firstStart);
+  // 页面加载后立即尝试
+  tryAutoStart();
 
-  // 点击切换
+  // 如果被拦截，监听用户首次交互
+  function firstInteraction() {
+    tryAutoStart();
+    document.removeEventListener('click', firstInteraction);
+    document.removeEventListener('touchstart', firstInteraction);
+    document.removeEventListener('scroll', firstInteraction);
+  }
+  document.addEventListener('click', firstInteraction);
+  document.addEventListener('touchstart', firstInteraction);
+  document.addEventListener('scroll', firstInteraction);
+
+  // ===== 切换按钮 =====
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (isPlaying) {
-      stopMusic();
+    if (isActive) {
+      stopScheduler();
+      isPausedByUser = true;
       btn.classList.remove('playing');
       btn.classList.add('paused');
-      icon.textContent = '🎵';
     } else {
-      startMusic();
+      isPausedByUser = false;
+      startScheduler();
       btn.classList.add('playing');
       btn.classList.remove('paused');
-      icon.textContent = '♪';
     }
-    isPlaying = !isPlaying;
   });
 
-  // 页面可见性变化时自动暂停/恢复
+  // 页面可见性
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden && isMusicActive) {
-      // 后台时降低音量或暂停
-      if (gainNode) gainNode.gain.value = 0.15;
-    } else if (!document.hidden && isMusicActive) {
-      if (gainNode) gainNode.gain.value = 0.6;
+    if (audioCtx && gainNode) {
+      gainNode.gain.value = document.hidden ? 0.08 : 0.5;
     }
   });
 })();
