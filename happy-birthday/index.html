@@ -927,7 +927,7 @@
     { text: '晨晨生日快乐！永远十八岁！', style: 'gold' },
     { text: '愿你眼里有光，心中有爱', style: 'pink' },
     { text: '新的一岁要更开心呀！', style: 'light' },
-    { text: '你是全世界最可爱的女孩子', style: 'lavender' },
+    { text: '你是全世界最可爱的', style: 'lavender' },
     { text: 'Happy Birthday!', style: 'peach' },
     { text: '愿所有美好如期而至', style: 'mint' },
     { text: '晨晨勇敢飞，我们永相随！', style: 'gold' },
@@ -974,7 +974,7 @@
 })();
 
 // =============================================
-// 6. 音乐（同之前 - 无缝循环）
+// 6. 音乐 - 完整重写，确保手机可用
 // =============================================
 (function initMusic() {
   const btn = document.getElementById('music-btn');
@@ -1003,21 +1003,23 @@
   const LOOP_LEN = 10.0;
 
   function playNote(ctx, dest, freq, time, dur, vol) {
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    const f = ctx.createBiquadFilter();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, time);
-    f.type = 'lowpass';
-    f.frequency.setValueAtTime(800, time);
-    f.frequency.linearRampToValueAtTime(1200, time + dur);
-    g.gain.setValueAtTime(0, time);
-    g.gain.linearRampToValueAtTime(vol, time + 0.03);
-    g.gain.setValueAtTime(vol, time + dur * 0.7);
-    g.gain.linearRampToValueAtTime(0, time + dur);
-    osc.connect(f).connect(g).connect(dest);
-    osc.start(time);
-    osc.stop(time + dur + 0.05);
+    try {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      const f = ctx.createBiquadFilter();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, time);
+      f.type = 'lowpass';
+      f.frequency.setValueAtTime(800, time);
+      f.frequency.linearRampToValueAtTime(1200, time + dur);
+      g.gain.setValueAtTime(0, time);
+      g.gain.linearRampToValueAtTime(vol, time + 0.03);
+      g.gain.setValueAtTime(vol, time + dur * 0.7);
+      g.gain.linearRampToValueAtTime(0, time + dur);
+      osc.connect(f).connect(g).connect(dest);
+      osc.start(time);
+      osc.stop(time + dur + 0.05);
+    } catch(e) {}
   }
 
   function scheduleOneLoop(ctx, dest, baseTime) {
@@ -1037,25 +1039,20 @@
   }
 
   function startScheduler() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      gainNode = audioCtx.createGain();
-      gainNode.gain.value = 0.5;
-      gainNode.connect(audioCtx.destination);
-    }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
     if (isActive) return;
     isActive = true;
-    let nextBase = audioCtx.currentTime + 0.1;
+    let nextBase = audioCtx.currentTime + 0.15;
     scheduleOneLoop(audioCtx, gainNode, nextBase);
     nextBase += LOOP_LEN;
     function keepScheduling() {
       if (!isActive) return;
-      const now = audioCtx.currentTime;
-      if (nextBase - now < 0.3) {
-        scheduleOneLoop(audioCtx, gainNode, nextBase);
-        nextBase += LOOP_LEN;
-      }
+      try {
+        const now = audioCtx.currentTime;
+        if (nextBase - now < 0.3) {
+          scheduleOneLoop(audioCtx, gainNode, nextBase);
+          nextBase += LOOP_LEN;
+        }
+      } catch(e) {}
       loopTimeout = setTimeout(keepScheduling, 200);
     }
     keepScheduling();
@@ -1066,27 +1063,52 @@
     if (loopTimeout) { clearTimeout(loopTimeout); loopTimeout = null; }
   }
 
-  // 等待启动封面点击
-  const startScreen = document.getElementById('start-screen');
-
-  function bootFromInteraction() {
-    if (!audioCtx) {
+  // ===== 核心：通过用户点击创建 AudioContext（手机必须） =====
+  function bootAudio() {
+    if (audioCtx) return;
+    try {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       gainNode = audioCtx.createGain();
-      gainNode.gain.value = 0.5;
+      gainNode.gain.value = 0.6;
       gainNode.connect(audioCtx.destination);
-    }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    if (!isPausedByUser && !isActive) startScheduler();
 
-    // 隐藏启动封面
-    startScreen.classList.add('hidden');
-    setTimeout(() => { startScreen.style.display = 'none'; }, 900);
+      // 播放一小段静音来"解锁"音频（iOS Safari 必须）
+      const silent = audioCtx.createBuffer(1, 1, 22050);
+      const src = audioCtx.createBufferSource();
+      src.buffer = silent;
+      src.connect(gainNode);
+      src.start(0);
+
+      // 确保 resume（iOS 需要）
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          startScheduler();
+        }).catch(() => {
+          // 降级：等下次交互
+          const retry = () => { document.removeEventListener('touchend', retry); bootAudio(); };
+          document.addEventListener('touchend', retry);
+        });
+      } else {
+        startScheduler();
+      }
+    } catch(e) {}
   }
 
-  startScreen.addEventListener('click', bootFromInteraction);
-  startScreen.addEventListener('touchstart', bootFromInteraction);
+  // 启动封面点击
+  const startScreen = document.getElementById('start-screen');
+  startScreen.addEventListener('click', () => {
+    bootAudio();
+    startScreen.classList.add('hidden');
+    setTimeout(() => { startScreen.style.display = 'none'; }, 900);
+  });
+  startScreen.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    bootAudio();
+    startScreen.classList.add('hidden');
+    setTimeout(() => { startScreen.style.display = 'none'; }, 900);
+  });
 
+  // 音乐按钮切换
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     if (isActive) {
@@ -1095,14 +1117,15 @@
       btn.classList.remove('playing');
     } else {
       isPausedByUser = false;
-      startScheduler();
+      if (!audioCtx) bootAudio();
+      else startScheduler();
       btn.classList.add('playing');
     }
   });
 
   document.addEventListener('visibilitychange', () => {
     if (audioCtx && gainNode) {
-      gainNode.gain.value = document.hidden ? 0.08 : 0.5;
+      gainNode.gain.value = document.hidden ? 0.08 : 0.6;
     }
   });
 })();
