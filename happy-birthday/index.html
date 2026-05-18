@@ -220,6 +220,51 @@
     text-align: center;
   }
 
+  /* ===== 结尾寄语页 ===== */
+  .page-closing .page-front {
+    background: linear-gradient(160deg, #fdf8f0, #f5ece0, #efe4d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+  }
+  .closing-content {
+    text-align: center;
+    position: relative;
+  }
+  .closing-icon {
+    font-size: 28px;
+    color: #d4a857;
+    margin-bottom: 15px;
+  }
+  .closing-icon.bottom {
+    margin-bottom: 0;
+    margin-top: 20px;
+  }
+  .closing-title {
+    font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+    font-size: clamp(1.6rem, 6vw, 2.8rem);
+    color: #8B6914;
+    letter-spacing: 0.15em;
+    margin-bottom: 18px;
+  }
+  .closing-body {
+    font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+    font-size: clamp(0.95rem, 3vw, 1.4rem);
+    color: #6b5a3e;
+    line-height: 1.8;
+    letter-spacing: 0.08em;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .closing-sign {
+    font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+    font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+    color: #a0865a;
+    margin-top: 20px;
+    letter-spacing: 0.1em;
+  }
+
   /* ===== 页码 ===== */
   #page-indicator {
     position: fixed;
@@ -385,6 +430,60 @@
     100% { opacity: var(--max-op, 1);   transform: scale(1.3); }
   }
 
+  /* ===== 弹幕 ===== */
+  #danmaku-container {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .danmaku-item {
+    position: absolute;
+    white-space: nowrap;
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+    font-size: clamp(0.75rem, 2.2vw, 1.1rem);
+    opacity: 0;
+    animation: danmakuScroll var(--dur, 10s) linear var(--delay, 0s) forwards;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    letter-spacing: 0.05em;
+    padding: 4px 0;
+  }
+  .danmaku-item.light {
+    color: rgba(255,255,255,0.85);
+  }
+  .danmaku-item.gold {
+    color: #fbbf24;
+  }
+  .danmaku-item.pink {
+    color: #f9a8d4;
+  }
+  .danmaku-item.lavender {
+    color: #c4b5fd;
+  }
+  .danmaku-item.peach {
+    color: #fdba74;
+  }
+  .danmaku-item.mint {
+    color: #6ee7b7;
+  }
+  @keyframes danmakuScroll {
+    0% {
+      opacity: 0;
+      transform: translateX(calc(100vw + 50px));
+    }
+    2% {
+      opacity: var(--max-op, 0.6);
+    }
+    90% {
+      opacity: var(--max-op, 0.6);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(calc(-100% - 50px));
+    }
+  }
+
   /* ===== 底部文字 ===== */
   #footer {
     position: fixed;
@@ -453,6 +552,9 @@
 <!-- 星星背景 -->
 <div id="starfield"></div>
 
+<!-- 弹幕 -->
+<div id="danmaku-container"></div>
+
 <!-- 电子书 -->
 <div id="book-wrapper">
   <div id="book">
@@ -482,7 +584,7 @@
 (function initBook() {
   const book = document.getElementById('book');
   const totalPhotos = 7;
-  const totalPages = 1 + totalPhotos; // 封面 + 7张照片
+  const totalPages = 1 + totalPhotos + 1; // 封面 + 7张照片 + 结尾寄语
   let currentIdx = 0; // 当前显示的页面索引
   let isAnimating = false;
   const hint = document.getElementById('flip-hint');
@@ -515,7 +617,7 @@
         '&#10022; 闪闪发光 &#10022;',
         '&#10022; 天真烂漫 &#10022;',
         '&#10022; 岁月静好 &#10022;',
-        '&#10022; 你是唯一 &#10022;',
+        '&#10022; 永远开心 &#10022;',
       ];
       p.innerHTML = `
         <div class="page-face page-front">
@@ -528,6 +630,30 @@
       `;
       book.appendChild(p);
     }
+
+    // 结尾寄语页
+    const closing = document.createElement('div');
+    closing.className = 'page page-closing';
+    closing.dataset.index = String(totalPhotos + 1);
+    closing.innerHTML = `
+      <div class="page-face page-front">
+        <div class="closing-content">
+          <div class="closing-icon">&#10024;</div>
+          <div class="closing-title">给 白晨晨</div>
+          <div class="closing-body">
+            愿你的每一天<br>
+            都有阳光照进心里<br>
+            愿每一个笑容<br>
+            都发自心底<br><br>
+            生日快乐，永远快乐
+          </div>
+          <div class="closing-sign">—— 爱你的大家</div>
+          <div class="closing-icon bottom">&#10024;</div>
+        </div>
+      </div>
+      <div class="page-face page-back"></div>
+    `;
+    book.appendChild(closing);
   }
   createPages();
 
@@ -721,10 +847,66 @@
   }, 80);
 })();
 
-// 星星闪烁和纸屑掉落的 keyframes (已移至 CSS)
+// 动画 keyframes 已移至 CSS
 
 // =============================================
-// 5. 音乐（同之前 - 无缝循环）
+// 5. 弹幕 - 滚动祝福
+// =============================================
+(function initDanmaku() {
+  const container = document.getElementById('danmaku-container');
+  const messages = [
+    { text: '晨晨生日快乐！永远十八岁！', style: 'gold' },
+    { text: '愿你眼里有光，心中有爱', style: 'pink' },
+    { text: '新的一岁要更开心呀！', style: 'light' },
+    { text: '你是全世界最可爱的女孩子', style: 'lavender' },
+    { text: 'Happy Birthday!', style: 'peach' },
+    { text: '愿所有美好如期而至', style: 'mint' },
+    { text: '晨晨勇敢飞，我们永相随！', style: 'gold' },
+    { text: '每天都要笑口常开哦', style: 'pink' },
+    { text: '你值得世间所有温柔', style: 'lavender' },
+    { text: '生日快乐！永远做自己！', style: 'light' },
+    { text: '愿你的世界永远温暖', style: 'peach' },
+    { text: '要幸福！要快乐！要发光！', style: 'mint' },
+    { text: '白晨晨，你是最棒的！', style: 'gold' },
+    { text: '愿你被这个世界温柔以待', style: 'pink' },
+    { text: '生日一定要快乐呀！', style: 'light' },
+    { text: '爱笑的女孩运气不会差', style: 'lavender' },
+    { text: '每一天都是最好的你', style: 'mint' },
+    { text: '祝福你，我亲爱的朋友', style: 'peach' },
+    { text: '生活的美好都奔你而来', style: 'gold' },
+    { text: '永远年轻，永远热泪盈眶', style: 'pink' },
+  ];
+
+  function spawn() {
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    const el = document.createElement('div');
+    el.className = 'danmaku-item ' + msg.style;
+    el.textContent = msg.text;
+    // 随机位置 (10% ~ 60% 垂直位置)
+    el.style.top = (8 + Math.random() * 55) + '%';
+    el.style.setProperty('--dur', (8 + Math.random() * 6).toFixed(1) + 's');
+    el.style.setProperty('--delay', '0s');
+    el.style.setProperty('--max-op', (0.5 + Math.random() * 0.4).toFixed(2));
+    el.style.fontSize = (0.75 + Math.random() * 0.35).toFixed(2) + 'rem';
+    container.appendChild(el);
+    // 移除已完成的弹幕
+    setTimeout(() => el.remove(), 16000);
+  }
+
+  // 开场密集发一波
+  let count = 0;
+  const burst = setInterval(() => {
+    if (count >= 15) { clearInterval(burst); return; }
+    spawn();
+    count++;
+  }, 400);
+
+  // 之后持续发送
+  setInterval(spawn, 2500);
+})();
+
+// =============================================
+// 6. 音乐（同之前 - 无缝循环）
 // =============================================
 (function initMusic() {
   const btn = document.getElementById('music-btn');
@@ -859,7 +1041,7 @@
 })();
 
 // =============================================
-// 6. 加载完成
+// 7. 加载完成
 // =============================================
 window.addEventListener('load', () => {
   setTimeout(() => {
