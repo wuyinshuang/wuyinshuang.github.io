@@ -41,179 +41,281 @@
     100% { opacity: 1; }
   }
 
-  /* ===== 幻灯片 ===== */
-  #slideshow {
+  /* ===== 电子书 ===== */
+  #book-wrapper {
     position: fixed;
     inset: 0;
-    z-index: 1;
-  }
-  .slide {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 1.8s ease-in-out;
-    overflow: hidden;
-  }
-  .slide.active {
-    opacity: 1;
-  }
-  .slide img {
-    position: absolute;
-    min-width: 100%;
-    min-height: 100%;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    animation: kenBurns 10s ease-in-out forwards;
-  }
-  @keyframes kenBurns {
-    0%   { transform: scale(1.0) translate(0, 0); }
-    50%  { transform: scale(1.08) translate(-1%, -1%); }
-    100% { transform: scale(1.0) translate(0, 0); }
-  }
-  .slide::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.4) 100%);
-  }
-
-  /* ===== 内容层 - 顶部布局 ===== */
-  #content {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
+    z-index: 5;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
+    perspective: 3000px;
     padding: 20px;
     pointer-events: none;
   }
-  #content > * { pointer-events: auto; }
+  #book-wrapper > * { pointer-events: auto; }
 
-  /* 顶部渐变遮罩，让文字在图片上更清晰 */
-  #top-mask {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 200px;
-    z-index: 9;
-    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+  #book {
+    position: relative;
+    width: min(88vw, 420px);
+    height: min(72vh, 560px);
+    transform-style: preserve-3d;
+    border-radius: 4px 12px 12px 4px;
+    box-shadow:
+      -8px 0 20px rgba(0,0,0,0.4),
+      0 8px 40px rgba(0,0,0,0.5),
+      0 0 60px rgba(255,200,100,0.06);
+  }
+
+  /* 书脊装饰 */
+  #spine {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 18px;
+    z-index: 200;
+    background: linear-gradient(90deg, #8B6914, #a0762a, #8B6914);
+    border-radius: 4px 0 0 4px;
+    box-shadow: inset -2px 0 8px rgba(0,0,0,0.3);
     pointer-events: none;
   }
-
-  /* ===== 标题 ===== */
-  .title-line {
-    margin-top: max(16px, 2.5vh);
-    text-align: center;
-    line-height: 1.3;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
-  }
-  .title-line .name {
-    display: block;
-    font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif;
-    font-size: clamp(2rem, 10vw, 4.5rem);
-    font-weight: 400;
-    background: linear-gradient(135deg, #fde68a, #fbbf24, #f59e0b, #fbbf24);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer 4s ease-in-out infinite;
-    filter: drop-shadow(0 0 30px rgba(251,191,36,0.25));
-    letter-spacing: 0.15em;
-    line-height: 1.2;
-  }
-  @keyframes shimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-  .title-line .sub {
-    display: block;
-    font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    font-size: clamp(1rem, 4.5vw, 2rem);
-    font-weight: 400;
-    background: linear-gradient(135deg, #fbcfe8, #f472b6, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-top: 0.05em;
-    letter-spacing: 0.3em;
-    line-height: 1.2;
-  }
-
-  /* ===== 打字副标题 - 底部 ===== */
-  #subtitle-wrap {
-    position: fixed;
-    bottom: 80px;
-    left: 0; right: 0;
-    z-index: 10;
-    text-align: center;
-    pointer-events: none;
-    background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%);
-    padding: 40px 20px 20px;
-  }
-  #subtitle {
-    font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    font-size: clamp(0.85rem, 2.5vw, 1.3rem);
-    color: rgba(255,255,255,0.8);
-    letter-spacing: 0.15em;
-    font-weight: 300;
-    min-height: 1.6em;
-    text-shadow: 0 2px 16px rgba(0,0,0,0.6);
-    display: inline-block;
-  }
-  #subtitle .cursor {
-    display: inline-block;
+  #spine::after {
+    content: '';
+    position: absolute;
+    top: 20px; bottom: 20px; left: 5px;
     width: 2px;
-    height: 1.1em;
-    background: #f9d976;
-    margin-left: 2px;
-    vertical-align: text-bottom;
-    animation: blink 0.8s step-end infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+    background: rgba(255,255,255,0.1);
+    border-radius: 1px;
   }
 
-  /* ===== BGM 开关 ===== */
+  /* 页面 */
+  .page {
+    position: absolute;
+    inset: 0;
+    transform-origin: 18px center;
+    transform-style: preserve-3d;
+    transition: transform 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+    will-change: transform;
+  }
+  .page-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 0 8px 8px 0;
+    overflow: hidden;
+  }
+  .page-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(135deg, #f5f0e8, #ede6d8);
+  }
+  .page-back::after {
+    content: '';
+    position: absolute;
+    inset: 15px;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: 4px;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(0,0,0,0.015) 28px,
+      rgba(0,0,0,0.015) 29px
+    );
+  }
+
+  /* 页面已翻状态 */
+  .page.flipped {
+    transform: rotateY(-180deg);
+    pointer-events: none;
+  }
+
+  /* ===== 封面 ===== */
+  .page-cover .page-front {
+    background: linear-gradient(145deg, #fbbf24 0%, #f59e0b 30%, #d97706 60%, #b45309 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+  }
+  .page-cover .page-front::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+  .page-cover .page-front::after {
+    content: '';
+    position: absolute;
+    inset: 18px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .cover-name {
+    font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+    font-size: clamp(2.2rem, 9vw, 3.8rem);
+    color: #fff;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.3);
+    letter-spacing: 0.15em;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-sub {
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    color: rgba(255,255,255,0.9);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.2);
+    margin-top: 0.25em;
+    letter-spacing: 0.2em;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-hearts {
+    position: absolute;
+    bottom: 30px;
+    left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 16px;
+    letter-spacing: 8px;
+    z-index: 1;
+  }
+
+  /* ===== 照片页 ===== */
+  .page-photo .page-front {
+    background: #fffaf3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+  }
+  .photo-frame {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-frame img {
+    width: 100%;
+    height: 85%;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+  }
+  .photo-caption {
+    margin-top: 10px;
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+    color: rgba(0,0,0,0.35);
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  /* ===== 页码 ===== */
+  #page-indicator {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+  }
+  #page-indicator .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.4s ease;
+  }
+  #page-indicator .dot.active {
+    background: #fbbf24;
+    box-shadow: 0 0 10px rgba(251,191,36,0.4);
+    width: 9px;
+    height: 9px;
+  }
+  #page-indicator .num {
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    margin-left: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== 翻页提示 ===== */
+  #flip-hint {
+    position: fixed;
+    z-index: 8;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  #flip-hint.show { opacity: 1; }
+  #flip-hint.right {
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.15);
+    font-size: 28px;
+    animation: hintPulse 2s ease-in-out infinite;
+  }
+  #flip-hint.left {
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%) rotate(180deg);
+    color: rgba(255,255,255,0.15);
+    font-size: 28px;
+    animation: hintPulse 2s ease-in-out infinite;
+  }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.15; transform: translateY(-50%) translateX(0); }
+    50% { opacity: 0.5; transform: translateY(-50%) translateX(-6px); }
+  }
+  #flip-hint.left {
+    animation-name: hintPulseLeft;
+  }
+  @keyframes hintPulseLeft {
+    0%, 100% { opacity: 0.15; transform: translateY(-50%) rotate(180deg) translateX(0); }
+    50% { opacity: 0.5; transform: translateY(-50%) rotate(180deg) translateX(-6px); }
+  }
+
+  /* ===== 音乐按钮 调整位置 ===== */
   #music-btn {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
+    bottom: 70px;
+    right: 20px;
     z-index: 100;
-    width: 52px;
-    height: 52px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.25);
-    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
     backdrop-filter: blur(10px);
-    color: rgba(255,255,255,0.8);
-    font-size: 22px;
+    color: rgba(255,255,255,0.7);
+    font-size: 18px;
     cursor: pointer;
     transition: all 0.4s ease;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  #music-btn:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.4);
-  }
   #music-btn.playing {
     animation: pulseBtn 2s ease-in-out infinite;
   }
   @keyframes pulseBtn {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(249,159,134,0.3); }
-    50% { box-shadow: 0 0 0 12px rgba(249,159,134,0); }
-  }
-  #music-btn .icon {
-    display: inline-block;
-    transition: transform 0.4s ease;
-  }
-  #music-btn.paused .icon {
-    transform: scale(0.8);
+    0%, 100% { box-shadow: 0 0 0 0 rgba(249,159,134,0.2); }
+    50% { box-shadow: 0 0 0 10px rgba(249,159,134,0); }
   }
 
   /* ===== 浮动心形 ===== */
@@ -348,176 +450,281 @@
 <!-- 背景 -->
 <div id="bg-gradient"></div>
 
-<!-- 幻灯片 -->
-<div id="slideshow"></div>
+<!-- 星星背景 -->
+<div id="starfield"></div>
 
-<!-- 顶部渐变遮罩 -->
-<div id="top-mask"></div>
-
-<!-- 内容 -->
-<div id="content">
-  <div class="title-line">
-    <span class="name">白晨晨</span>
-    <span class="sub">🎂 生日快乐 🎂</span>
+<!-- 电子书 -->
+<div id="book-wrapper">
+  <div id="book">
+    <div id="spine"></div>
+    <!-- 页面由 JS 生成 -->
   </div>
 </div>
 
-<!-- 副标题（底部） -->
-<div id="subtitle-wrap">
-  <div id="subtitle"></div>
-</div>
+<!-- 翻页提示 -->
+<div id="flip-hint" class="right">&#10095;</div>
 
-<div id="footer">✦ 愿你每一天都闪闪发光 ✦</div>
+<!-- 页码 -->
+<div id="page-indicator"></div>
+
+<!-- 底部提示 -->
+<div id="footer">&#10022; 轻触翻页 &#10022;</div>
 
 <!-- 音乐按钮 -->
 <button id="music-btn" class="playing" title="点击开关音乐">
-  <span class="icon">🎵</span>
+  <span class="icon">&#9835;</span>
 </button>
 
 <script>
 // =============================================
-// 1. 幻灯片
+// 1. 电子书 - 翻页
 // =============================================
-(function initSlideshow() {
-  const container = document.getElementById('slideshow');
-  const count = 7;
-  const slides = [];
-  for (let i = 1; i <= count; i++) {
-    const div = document.createElement('div');
-    div.className = 'slide' + (i === 1 ? ' active' : '');
-    const img = document.createElement('img');
-    img.src = `照片/${i}.jpg`;
-    img.alt = `Photo ${i}`;
-    img.loading = i <= 2 ? 'eager' : 'lazy';
-    div.appendChild(img);
-    container.appendChild(div);
-    slides.push(div);
+(function initBook() {
+  const book = document.getElementById('book');
+  const totalPhotos = 7;
+  const totalPages = 1 + totalPhotos; // 封面 + 7张照片
+  let currentIdx = 0; // 当前显示的页面索引
+  let isAnimating = false;
+  const hint = document.getElementById('flip-hint');
+
+  // 生成页面
+  function createPages() {
+    // 封面
+    const cover = document.createElement('div');
+    cover.className = 'page page-cover';
+    cover.dataset.index = '0';
+    cover.innerHTML = `
+      <div class="page-face page-front">
+        <div class="cover-name">白晨晨</div>
+        <div class="cover-sub">&#127874; 生日快乐 &#127874;</div>
+        <div class="cover-hearts">&#10084; &#10084; &#10084;</div>
+      </div>
+      <div class="page-face page-back"></div>
+    `;
+    book.appendChild(cover);
+
+    // 照片页
+    for (let i = 1; i <= totalPhotos; i++) {
+      const p = document.createElement('div');
+      p.className = 'page page-photo';
+      p.dataset.index = String(i);
+      const captions = [
+        '&#10022; 美好时光 &#10022;',
+        '&#10022; 笑颜如花 &#10022;',
+        '&#10022; 温暖如你 &#10022;',
+        '&#10022; 闪闪发光 &#10022;',
+        '&#10022; 天真烂漫 &#10022;',
+        '&#10022; 岁月静好 &#10022;',
+        '&#10022; 你是唯一 &#10022;',
+      ];
+      p.innerHTML = `
+        <div class="page-face page-front">
+          <div class="photo-frame">
+            <img src="照片/${i}.jpg" alt="Photo ${i}" loading="${i <= 2 ? 'eager' : 'lazy'}">
+            <div class="photo-caption">${captions[i-1]}</div>
+          </div>
+        </div>
+        <div class="page-face page-back"></div>
+      `;
+      book.appendChild(p);
+    }
   }
-  let current = 0;
-  let interval = setInterval(nextSlide, 5000);
-  function nextSlide() {
-    slides[current].classList.remove('active');
-    current = (current + 1) % count;
-    slides[current].classList.add('active');
+  createPages();
+
+  const pages = book.querySelectorAll('.page');
+
+  // 初始化 z-index: 封面在最上面，照片页依次递减
+  function resetZIndices() {
+    for (let i = 0; i < pages.length; i++) {
+      if (pages[i].classList.contains('flipped')) {
+        pages[i].style.zIndex = i + 1; // 已翻页的在下面
+      } else {
+        pages[i].style.zIndex = pages.length - i; // 未翻页的按顺序
+      }
+    }
   }
-  // 点击切换
-  container.addEventListener('click', () => {
-    clearInterval(interval);
-    nextSlide();
-    interval = setInterval(nextSlide, 5000);
+  resetZIndices();
+
+  // 更新页码指示器
+  function updateIndicator() {
+    const container = document.getElementById('page-indicator');
+    container.innerHTML = '';
+    for (let i = 0; i < totalPages; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'dot' + (i === currentIdx ? ' active' : '');
+      container.appendChild(dot);
+    }
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = `${currentIdx + 1} / ${totalPages}`;
+    container.appendChild(num);
+
+    // 显示/隐藏翻页提示
+    hint.classList.remove('show');
+    if (currentIdx === 0) {
+      hint.classList.add('show');
+      hint.className = 'right show';
+    } else if (currentIdx === totalPages - 1) {
+      hint.classList.add('show');
+      hint.className = 'left show';
+    }
+  }
+  updateIndicator();
+
+  // 翻到下一页
+  function flipForward() {
+    if (isAnimating || currentIdx >= totalPages - 1) return;
+    isAnimating = true;
+
+    const page = pages[currentIdx];
+    page.classList.add('flipped');
+    page.style.zIndex = 0; // 沉底
+
+    currentIdx++;
+    updateIndicator();
+
+    setTimeout(() => { isAnimating = false; }, 800);
+  }
+
+  // 翻回上一页
+  function flipBack() {
+    if (isAnimating || currentIdx <= 0) return;
+    isAnimating = true;
+
+    currentIdx--;
+    const page = pages[currentIdx];
+    page.classList.remove('flipped');
+    page.style.zIndex = pages.length - currentIdx; // 放回正确位置
+
+    updateIndicator();
+
+    setTimeout(() => { isAnimating = false; }, 800);
+  }
+
+  // 点击区域判断
+  book.addEventListener('click', (e) => {
+    const rect = book.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const mid = rect.width / 2;
+    if (x > mid) {
+      flipForward();
+    } else {
+      flipBack();
+    }
+  });
+
+  // 触摸滑动
+  let touchStartX = 0;
+  let touchStartY = 0;
+  book.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  book.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    // 滑动距离 > 30px 且水平分量大于垂直分量
+    if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) flipForward();
+      else flipBack();
+    }
+  }, { passive: true });
+
+  // 键盘
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') flipForward();
+    if (e.key === 'ArrowLeft') flipBack();
   });
 })();
 
 // =============================================
-// 2. 打字副标题
-// =============================================
-(function initTyping() {
-  const el = document.getElementById('subtitle');
-  const lines = [
-    '愿你的笑容比星光更灿烂 ✨',
-    '愿所有的美好都如约而至 🌸',
-    '新的一岁，要更快乐更自由 🦋',
-    '你值得世间所有的温柔 💕',
-    'Happy Birthday to You 🎉'
-  ];
-  let lineIdx = 0, charIdx = 0, isDeleting = false;
-  const cursor = document.createElement('span');
-  cursor.className = 'cursor';
-
-  function tick() {
-    const full = lines[lineIdx];
-    if (!isDeleting) {
-      charIdx++;
-      el.textContent = full.slice(0, charIdx);
-      el.appendChild(cursor);
-      if (charIdx >= full.length) {
-        setTimeout(() => { isDeleting = true; tick(); }, 2500);
-        return;
-      }
-      setTimeout(tick, 60 + Math.random() * 40);
-    } else {
-      charIdx--;
-      el.textContent = full.slice(0, charIdx);
-      el.appendChild(cursor);
-      if (charIdx <= 0) {
-        isDeleting = false;
-        lineIdx = (lineIdx + 1) % lines.length;
-        setTimeout(tick, 400);
-        return;
-      }
-      setTimeout(tick, 30);
-    }
-  }
-  setTimeout(tick, 800);
-})();
-
-// =============================================
-// 3. 星星背景
+// 2. 星星背景
 // =============================================
 (function initStars() {
-  const count = 120;
+  const container = document.getElementById('starfield');
+  const count = 100;
   for (let i = 0; i < count; i++) {
     const star = document.createElement('div');
     star.className = 'star';
-    const size = 1 + Math.random() * 3;
-    star.style.setProperty('--star-size', size + 'px');
-    star.style.left = (Math.random() * 100) + '%';
-    star.style.top = (Math.random() * 100) + '%';
-    star.style.setProperty('--min-op', (0.1 + Math.random() * 0.3).toFixed(2));
-    star.style.setProperty('--max-op', (0.4 + Math.random() * 0.6).toFixed(2));
-    star.style.setProperty('--twinkle-dur', (2 + Math.random() * 4).toFixed(1) + 's');
-    star.style.animationDelay = (Math.random() * 5).toFixed(1) + 's';
-    document.body.appendChild(star);
+    const size = 1 + Math.random() * 2.5;
+    star.style.cssText = `
+      position: fixed;
+      z-index: 2;
+      width: ${size}px;
+      height: ${size}px;
+      border-radius: 50%;
+      background: #fff;
+      left: ${Math.random() * 100}%;
+      top: ${Math.random() * 100}%;
+      opacity: ${0.15 + Math.random() * 0.5};
+      animation: twinkle ${2 + Math.random() * 4}s ease-in-out infinite alternate;
+      animation-delay: ${Math.random() * 5}s;
+      pointer-events: none;
+    `;
+    container.appendChild(star);
   }
 })();
 
 // =============================================
-// 4. 浮动心形
+// 3. 浮动心形
 // =============================================
 (function initFloatingHearts() {
-  const emojis = ['❤️', '💕', '💗', '✨', '🌸', '🎈', '💖', '🌟', '🦋', '💝'];
-  function create() {
+  const emojis = ['❤️', '💕', '💗', '✨', '🌸', '🎈', '💖', '🌟', '💝'];
+  setInterval(() => {
     const el = document.createElement('div');
     el.className = 'float-heart';
     el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    el.style.left = (5 + Math.random() * 90) + '%';
-    el.style.fontSize = (16 + Math.random() * 24) + 'px';
-    el.style.setProperty('--dur', (6 + Math.random() * 6).toFixed(1) + 's');
-    el.style.setProperty('--delay', '0s');
-    el.style.setProperty('--max-opacity', (0.4 + Math.random() * 0.4).toFixed(2));
-    el.style.setProperty('--rot', (180 + Math.random() * 360) + 'deg');
+    el.style.cssText = `
+      position: fixed;
+      z-index: 4;
+      font-size: ${16 + Math.random() * 20}px;
+      opacity: 0;
+      pointer-events: none;
+      left: ${5 + Math.random() * 90}%;
+      animation: floatUp ${6 + Math.random() * 6}s ease-in 0s forwards;
+    `;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 12000);
-  }
-  setInterval(create, 500);
-  for (let i = 0; i < 5; i++) setTimeout(create, i * 300);
+    setTimeout(() => el.remove(), 13000);
+  }, 600);
+  for (let i = 0; i < 3; i++) setTimeout(() => {}, i * 200);
 })();
 
 // =============================================
-// 5. 五彩纸屑
+// 4. 五彩纸屑（开场放一波）
 // =============================================
 (function initConfetti() {
-  const colors = ['#f9d976', '#f39f86', '#ff6b9d', '#c084fc', '#60a5fa', '#34d399', '#fb923c', '#ffd1dc'];
-  function create() {
+  const colors = ['#f9d976', '#f39f86', '#ff6b9d', '#c084fc', '#60a5fa', '#34d399', '#fb923c'];
+  let count = 0;
+  const max = 40;
+  const interval = setInterval(() => {
+    if (count >= max) { clearInterval(interval); return; }
     const el = document.createElement('div');
     el.className = 'confetti-piece';
-    const size = 6 + Math.random() * 10;
-    el.style.setProperty('--size', size + 'px');
-    el.style.left = (Math.random() * 100) + '%';
-    el.style.background = colors[Math.floor(Math.random() * colors.length)];
-    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-    el.style.setProperty('--fall-dur', (3 + Math.random() * 3).toFixed(1) + 's');
-    el.style.setProperty('--delay', (Math.random() * 2).toFixed(1) + 's');
-    el.style.setProperty('--spin', (360 + Math.random() * 720) + 'deg');
+    const size = 6 + Math.random() * 8;
+    el.style.cssText = `
+      position: fixed;
+      z-index: 6;
+      width: ${size}px;
+      height: ${size}px;
+      top: -20px;
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      opacity: 0;
+      pointer-events: none;
+      animation: confettiFall ${3 + Math.random() * 3}s ease-in ${Math.random() * 2}s forwards;
+    `;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 8000);
-  }
-  setInterval(create, 200);
-  for (let i = 0; i < 10; i++) setTimeout(create, i * 80);
+    count++;
+  }, 80);
 })();
 
+// 星星闪烁和纸屑掉落的 keyframes (已移至 CSS)
+
 // =============================================
-// 6. 音乐 - Web Audio API 演奏生日快乐（无缝循环）
+// 5. 音乐（同之前 - 无缝循环）
 // =============================================
 (function initMusic() {
   const btn = document.getElementById('music-btn');
@@ -528,7 +735,6 @@
   let loopTimeout = null;
   let isPausedByUser = false;
 
-  // 生日快乐旋律: [频率, 相对起始时间, 时长]
   const melody = [
     [261.63, 0, 0.3], [261.63, 0.35, 0.15],
     [293.66, 0.55, 0.3], [261.63, 0.9, 0.3],
@@ -544,7 +750,7 @@
     [392.00, 7.85, 0.3], [349.23, 8.2, 0.3],
     [392.00, 8.55, 0.3], [349.23, 8.9, 0.6],
   ];
-  const LOOP_LEN = 10.0; // 总时长
+  const LOOP_LEN = 10.0;
 
   function playNote(ctx, dest, freq, time, dur, vol) {
     const osc = ctx.createOscillator();
@@ -564,13 +770,10 @@
     osc.stop(time + dur + 0.05);
   }
 
-  // 用 AudioContext 精确时间调度一个完整循环
   function scheduleOneLoop(ctx, dest, baseTime) {
     melody.forEach(([freq, t, dur]) => {
-      const absTime = baseTime + t;
-      playNote(ctx, dest, freq, absTime, dur, 0.12);
+      playNote(ctx, dest, freq, baseTime + t, dur, 0.12);
     });
-    // 简易和弦伴奏
     const chordPoints = [0, 2.3, 4.6, 7.3];
     const chordFreqs = [
       [261.63, 329.63, 392.00],
@@ -579,8 +782,7 @@
       [261.63, 329.63, 392.00],
     ];
     chordPoints.forEach((cp, i) => {
-      const absTime = baseTime + cp;
-      chordFreqs[i].forEach(f => playNote(ctx, dest, f, absTime, 1.8, 0.04));
+      chordFreqs[i].forEach(f => playNote(ctx, dest, f, baseTime + cp, 1.8, 0.04));
     });
   }
 
@@ -594,17 +796,13 @@
     if (audioCtx.state === 'suspended') audioCtx.resume();
     if (isActive) return;
     isActive = true;
-
-    // 以 AudioContext 当前时间为基准，持续调度未来的循环
     let nextBase = audioCtx.currentTime + 0.1;
     scheduleOneLoop(audioCtx, gainNode, nextBase);
     nextBase += LOOP_LEN;
-
     function keepScheduling() {
       if (!isActive) return;
       const now = audioCtx.currentTime;
-      const ahead = 0.3; // 提前 300ms 调度下一个循环
-      if (nextBase - now < ahead) {
+      if (nextBase - now < 0.3) {
         scheduleOneLoop(audioCtx, gainNode, nextBase);
         nextBase += LOOP_LEN;
       }
@@ -618,8 +816,6 @@
     if (loopTimeout) { clearTimeout(loopTimeout); loopTimeout = null; }
   }
 
-  // ===== 自动启动（尝试绕过浏览器策略） =====
-  // 直接创建并尝试启动
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   gainNode = audioCtx.createGain();
   gainNode.gain.value = 0.5;
@@ -627,45 +823,34 @@
 
   function tryAutoStart() {
     if (audioCtx.state === 'suspended') {
-      audioCtx.resume().then(() => {
-        if (!isPausedByUser) startScheduler();
-      }).catch(() => {});
+      audioCtx.resume().then(() => { if (!isPausedByUser) startScheduler(); }).catch(() => {});
     } else {
       if (!isPausedByUser) startScheduler();
     }
   }
-
-  // 页面加载后立即尝试
   tryAutoStart();
 
-  // 如果被拦截，监听用户首次交互
   function firstInteraction() {
     tryAutoStart();
     document.removeEventListener('click', firstInteraction);
     document.removeEventListener('touchstart', firstInteraction);
-    document.removeEventListener('scroll', firstInteraction);
   }
   document.addEventListener('click', firstInteraction);
   document.addEventListener('touchstart', firstInteraction);
-  document.addEventListener('scroll', firstInteraction);
 
-  // ===== 切换按钮 =====
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     if (isActive) {
       stopScheduler();
       isPausedByUser = true;
       btn.classList.remove('playing');
-      btn.classList.add('paused');
     } else {
       isPausedByUser = false;
       startScheduler();
       btn.classList.add('playing');
-      btn.classList.remove('paused');
     }
   });
 
-  // 页面可见性
   document.addEventListener('visibilitychange', () => {
     if (audioCtx && gainNode) {
       gainNode.gain.value = document.hidden ? 0.08 : 0.5;
@@ -674,25 +859,13 @@
 })();
 
 // =============================================
-// 7. 页面加载完成
+// 6. 加载完成
 // =============================================
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('loader').classList.add('hidden');
   }, 500);
 });
-
-// =============================================
-// 8. 预加载下几张图片
-// =============================================
-(function preloadImages() {
-  const imgs = [];
-  for (let i = 3; i <= 7; i++) {
-    const img = new Image();
-    img.src = `照片/${i}.jpg`;
-    imgs.push(img);
-  }
-})();
 </script>
 </body>
 </html>
