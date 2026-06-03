@@ -2,7 +2,7 @@
 layout: post
 title: "如何增强github官网访问稳定性"
 date: 2026-04-14
-categories: [部署运维]
+categories: [运维]
 tags: [GitHub]
 author: wuys
 ---
