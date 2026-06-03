@@ -210,6 +210,8 @@ find 查找路径 查找方式
 find . -name "*.txt"  或 find -name "*.txt"
 # 查找 /var/log 目录下大于 1MB 的文件
 find /var/log -type f -size + 1M
+# 查找/var/log 目录下的日志文件
+find /var/log -type f -name "*.log"
 ```
 
 ![7b9a6870-0b8f-4d74-adc6-eb2b0818e36e](images/7b9a6870-0b8f-4d74-adc6-eb2b0818e36e.png)
