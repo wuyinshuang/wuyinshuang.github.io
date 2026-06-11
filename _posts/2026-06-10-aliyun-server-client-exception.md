@@ -20,7 +20,7 @@ author: wuys
 
 恢复后通过putty连接服务器终端，查看服务器上是否有定时任务：
 
-![73012f688650b358696b8532dc7b9fc1](C:\Users\wys19\xwechat_files\wxid_uxa42367wgzq22_7d63\temp\RWTemp\2026-06\73012f688650b358696b8532dc7b9fc1.png) 
+![88b9c39e-e063-4a8f-9ada-0e337bb06e0d](images/88b9c39e-e063-4a8f-9ada-0e337bb06e0d.png)
 
 日志清晰显示：服务器上Rocky Linux 9自带的 mlocate-updatedb.timer 服务mlocate-updatedb.service 在每天凌晨00:00运行，并在6月7日、8日、9日、10日都有执行记录。
 
@@ -52,5 +52,3 @@ systemctl status mlocate-updatedb.timer
 **日期**：2026年6月10日
 
 **平台**：GitHub Pages / 技术博客
-
-
