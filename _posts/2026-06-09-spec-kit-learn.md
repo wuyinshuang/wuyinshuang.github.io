@@ -236,10 +236,6 @@ Spec Kit流程：
 * 开发流程
 
 * 治理规则
-  
-  
-  
-  
 
 ##### 2. 创建功能规范
 
@@ -290,10 +286,6 @@ Spec Kit流程：
 * **用户导向**：描述用户旅程
 
 * **可交付**：每个故事都是可用的功能增量
-  
-  
-  
-  
 
 ##### 3. 澄清需求
 
@@ -550,7 +542,7 @@ specify init .
 
 ![7a6d94de-0cc9-4615-a3f1-5171c7ac3f02](images/7a6d94de-0cc9-4615-a3f1-5171c7ac3f02.png)
 
-![ad718b48-0f67-4f52-a0ab-05cd1c580823](images/ad718b48-0f67-4f52-a0ab-05cd1c580823.png)
+![9e286ad5-a568-46cb-9a9d-f8d011b5251c](images/9e286ad5-a568-46cb-9a9d-f8d011b5251c.png)
 
 ![5c62421f-1cac-4efa-a444-97b13e67a1fd](images/5c62421f-1cac-4efa-a444-97b13e67a1fd.png)
 
